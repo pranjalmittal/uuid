@@ -18,6 +18,13 @@ import (
 // 4122.
 type UUID [16]byte
 
+// NullUUID can be used with the standard sql package to represent a
+// UUID value that can be NULL in the database
+type NullUUID struct {
+	UUID  UUID
+	Valid bool
+}
+
 // A Version represents a UUID's version.
 type Version byte
 

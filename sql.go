@@ -57,3 +57,27 @@ func (uuid *UUID) Scan(src interface{}) error {
 func (uuid UUID) Value() (driver.Value, error) {
 	return uuid.String(), nil
 }
+
+// Value implements sql.Valuer so that UUIDs can be written to databases
+// transparently. Support for null UUID
+func (u NullUUID) Value() (driver.Value, error) {
+	if !u.Valid {
+		return nil, nil
+	}
+
+	// Delegate to UUID Value function
+	return u.UUID.Value()
+}
+
+// Scan implements sql.Scanner so UUIDs can be read from databases transparently
+// Support null UUID
+func (u *NullUUID) Scan(src interface{}) error {
+	if src == nil {
+		u.UUID, u.Valid = Nil, false
+		return nil
+	}
+
+	// Delegate to UUID Scan function
+	u.Valid = true
+	return u.UUID.Scan(src)
+}
